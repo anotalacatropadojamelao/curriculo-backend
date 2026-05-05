@@ -32,10 +32,9 @@ app.post("/webhook", async (req, res) => {
     if (data.status === "paid") {
       const email = data.customer.email;
 
-      await supabase.auth.admin.createUser({
-        email: email,
-        email_confirm: true
-      });
+      await supabase.auth.signInWithOtp({
+  email: email
+});
 
       console.log("Usuário criado:", email);
     }

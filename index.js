@@ -4,11 +4,18 @@ const { createClient } = require("@supabase/supabase-js");
 const app = express();
 app.use(express.json());
 
-// 🔐 usa variáveis de ambiente (IMPORTANTE)
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+// ⚠️ só cria se existir
+let supabase;
+
+if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
+  supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+  );
+  console.log("Supabase conectado");
+} else {
+  console.log("Supabase NÃO configurado ainda");
+}
 
 app.get("/", (req, res) => {
   res.send("Servidor funcionando");
@@ -16,6 +23,10 @@ app.get("/", (req, res) => {
 
 app.post("/webhook", async (req, res) => {
   try {
+    if (!supabase) {
+      return res.sendStatus(200);
+    }
+
     const data = req.body;
 
     if (data.status === "paid") {
